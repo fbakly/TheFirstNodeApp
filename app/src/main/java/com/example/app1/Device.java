@@ -27,23 +27,6 @@ public class Device {
         return device_id;
     }
 
-    public Payload getPayload(String date, String time) {
-        for(Payload payload : payloads) {
-            if (payload.getDate_stamp().equals(date) && payload.getTime_stamp().equals(time))
-                return payload;
-        }
-        return null;
-    }
-
-    public ArrayList<Payload> getDayPayload(String date) {
-        ArrayList<Payload> dayPayload = new ArrayList<>();
-        for (Payload payload : payloads) {
-            if (payload.getDate_stamp().equals(date))
-                dayPayload.add(payload);
-        }
-        return dayPayload;
-    }
-
     public ArrayList<Payload> getPayloads() {
         return payloads;
     }

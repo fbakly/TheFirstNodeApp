@@ -84,13 +84,6 @@ public class Payload {
 
     @Override
     public String toString() {
-        return "Payload{" +
-                "device_id='" + device_id + '\'' +
-                ", time_stamp='" + time_stamp + '\'' +
-                ", temperature='" + temperature + '\'' +
-                ", humidity='" + humidity + '\'' +
-                ", barometric='" + barometric + '\'' +
-                ", luminostiy='" + luminostiy + '\'' +
-                '}';
+        return device_id + " " + time_stamp + " " + temperature + " " + humidity + " " + barometric + " " + luminostiy;
     }
 }

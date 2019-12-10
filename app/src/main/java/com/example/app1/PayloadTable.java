@@ -21,8 +21,16 @@ import org.w3c.dom.Text;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import de.codecrafters.tableview.SortableTableView;
+import de.codecrafters.tableview.TableView;
+import de.codecrafters.tableview.model.TableColumnDpWidthModel;
+import de.codecrafters.tableview.model.TableColumnModel;
+import de.codecrafters.tableview.model.TableColumnWeightModel;
+import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
+import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
+
 public class PayloadTable extends AppCompatActivity{
-    TableLayout payloadTable;
+    TableView<String[]> payloadTable;
 
     public PayloadTable() {
     }
@@ -34,16 +42,15 @@ public class PayloadTable extends AppCompatActivity{
 
         Button homeButton = (Button) findViewById(R.id.homeButton);
         Button refreshButton = (Button) findViewById(R.id.refreshButton);
-        payloadTable = (TableLayout) findViewById(R.id.payloadTable);
+        payloadTable = (TableView<String[]>) findViewById(R.id.payloadTable);
         TextView deviceID = (TextView) findViewById(R.id.deviceID);
 
         Intent intent = getIntent();
-        ArrayList<Payload> payloads = (ArrayList<Payload>) Parcels.unwrap(intent.getExtras().getParcelable("payloads"));
         final ArrayList<Device> devices = (ArrayList<Device>) Parcels.unwrap(intent.getExtras().getParcelable("devices"));
+        ArrayList<Payload> payloads = devices.get(0).getPayloads();
         final String nodeID = intent.getExtras().getString("nodeID");
 
         deviceID.setText(nodeID);
-
         new TableCreator().execute(payloads, payloads, null);
 
         homeButton.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +73,8 @@ public class PayloadTable extends AppCompatActivity{
         });
     }
 
+
+
     class TableCreator extends AsyncTask<ArrayList<Payload>, ArrayList<Payload>, Void> {
         @Override
         protected Void doInBackground(ArrayList<Payload>... values) {
@@ -76,42 +85,26 @@ public class PayloadTable extends AppCompatActivity{
         @Override
         protected void onProgressUpdate(ArrayList<Payload>... values) {
             super.onProgressUpdate(values);
-//            ArrayList<Payload> payloads = values[0];
-//            for (Payload payload : payloads) {
-//                TableRow tr = new TableRow(PayloadTable.this);
-//                TextView device_id = new TextView(PayloadTable.this);
-//                TextView date = new TextView(PayloadTable.this);
-//                TextView time = new TextView(PayloadTable.this);
-//                TextView temp = new TextView(PayloadTable.this);
-//                TextView humidity = new TextView(PayloadTable.this);
-//                TextView pressure = new TextView(PayloadTable.this);
-//                TextView light = new TextView(PayloadTable.this);
-//
-//                device_id.setText(payload.getDevice_id());
-//                date.setText(payload.getDate_stamp());
-//                time.setText(payload.getTime_stamp());
-//                temp.setText(payload.getTemperature());
-//                humidity.setText(payload.getHumidity());
-//                pressure.setText(payload.getBarometric());
-//                light.setText(payload.getLuminostiy());
-//
-//                device_id.setPadding(10, 0, 10, 0);
-//                date.setPadding(10, 0, 10, 0);
-//                time.setPadding(10, 0, 10, 0);
-//                temp.setPadding(10, 0, 10, 0);
-//                humidity.setPadding(10, 0, 10, 0);
-//                pressure.setPadding(10, 0, 10, 0);
-//                light.setPadding(10, 0, 10, 0);
-//
-//                tr.addView(device_id);
-//                tr.addView(date);
-//                tr.addView(time);
-//                tr.addView(temp);
-//                tr.addView(humidity);
-//                tr.addView(pressure);
-//                tr.addView(light);
-//                payloadTable.addView(tr);
-//            }
+            ArrayList<Payload> payloads = values[0];
+            int size = payloads.size();
+            String[][] data = new String[size][6];
+            TableColumnWeightModel columnModel = new TableColumnWeightModel(6);
+            columnModel.setColumnWeight(1, 2);
+            String[] tableHeaders = {"device_id", "DateTime", (char) 0x00B0 + "C", "Humidity(%)", "hPa", "Lux"};
+            for (int row = 0; row < size; row++) {
+                Payload payload = payloads.get(row);
+                data[row][0] = payload.getDevice_id();
+                data[row][1] = payload.getTime_stamp();
+                data[row][2] = payload.getTemperature();
+                data[row][3] = payload.getHumidity();
+                data[row][4] = payload.getBarometric() + "0";
+                data[row][5] = payload.getLuminostiy();
+            }
+            payloadTable.setColumnModel(columnModel);
+            payloadTable.setDataAdapter(new SimpleTableDataAdapter(PayloadTable.this, data));
+            SimpleTableHeaderAdapter simpleTableHeaderAdapter = new SimpleTableHeaderAdapter(PayloadTable.this, tableHeaders);
+            simpleTableHeaderAdapter.setTextSize(12);
+            payloadTable.setHeaderAdapter(simpleTableHeaderAdapter);
         }
     }
 }

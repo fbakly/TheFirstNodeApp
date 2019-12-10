@@ -10,6 +10,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,12 +21,14 @@ import java.util.ArrayList;
 
 public class LoadData extends AppCompatActivity {
     ArrayList<Device> devices;
-
+    DatabaseReference mDatabase;
+    final String url = "http://lora.fambaan.com/php/getPayloads.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load_data);
-        final String url = "http://lora.fambaan.com/php/getPayloads.php";
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         devices = new ArrayList<>();
 
         // Get a request Queue
@@ -34,6 +38,7 @@ public class LoadData extends AppCompatActivity {
             @Override
             public void onResponse(JSONArray response) {
                 try {
+//                    mDatabase.child("Payload").removeValue();
                     int length = response.length();
                     for (int index = 0; index < length; index++) {
                         JSONObject row = (JSONObject) response.get(index);
@@ -48,6 +53,7 @@ public class LoadData extends AppCompatActivity {
                                 row.getString("barometric"),
                                 row.getString("luminosity")
                         ));
+//                        mDatabase.child("Payload").child(row.getString("device_id") + " " + row.getString("time_stamp")).push().setValue(row.getString("temperature"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
