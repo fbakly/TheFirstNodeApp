@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     Payload tempPayload = payloads.get(index);
                     try {
                         Date tempPayloadDate = sdf.parse(tempPayload.getTime_stamp());
+                        calendar.setTime(tempPayloadDate);
                         if (tempPayloadDate.after(targetDate[0]) || tempPayloadDate.equals(targetDate[0])) {
                             tempEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getTemperature())));
                             humidityEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getHumidity())));
