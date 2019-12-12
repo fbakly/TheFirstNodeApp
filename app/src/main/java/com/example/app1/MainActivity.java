@@ -3,6 +3,7 @@ package com.example.app1;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -66,15 +67,18 @@ public class MainActivity extends AppCompatActivity {
         Button refresh = (Button) findViewById(R.id.refreshButtonHome);
         TextView nodeID = (TextView) findViewById(R.id.nodeID);
         TextView nodeReading = (TextView) findViewById(R.id.nodeReading);
-        LineChart tempChart = (LineChart) findViewById(R.id.tempChart);
-        LineChart humidityChart = (LineChart) findViewById(R.id.humidityChart);
-        LineChart pressureChart = (LineChart) findViewById(R.id.pressureChart);
-        LineChart lightChart = (LineChart) findViewById(R.id.lightChart);
-        Spinner homePeriodSpinner = (Spinner) findViewById(R.id.homePeriodSpinner);
+        final MyChart tempChart = new MyChart((LineChart) findViewById(R.id.tempChart));
+        final MyChart humidityChart = new MyChart((LineChart) findViewById(R.id.humidityChart));
+        final MyChart pressureChart = new MyChart((LineChart) findViewById(R.id.pressureChart));
+        final MyChart lightChart = new MyChart((LineChart) findViewById(R.id.lightChart));
+        final Spinner homePeriodSpinner = (Spinner) findViewById(R.id.homePeriodSpinner);
         ArrayList<String> spinnerItems = new ArrayList<>();
         spinnerItems.add("Hour");
         spinnerItems.add("Day");
         spinnerItems.add("Week");
+        spinnerItems.add("Since Start");
+        final int[] labelCount = {0};
+        final String[] format = {""};
 
         homePeriodSpinner.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, spinnerItems));
 
@@ -84,46 +88,124 @@ public class MainActivity extends AppCompatActivity {
         String lastReading = devices.get(0).getPayloads().get(devices.get(0).getPayloads().size() - 1).getTemperature();
         nodeReading.setText(lastReading + (char) 0x00B0 + "C");
 
-        LegendEntry tempLegendEntry = new LegendEntry();
-        tempLegendEntry.label = "Temperature";
-        tempLegendEntry.formColor = ColorTemplate.rgb("66FFFF");
-        tempChart.getLegend().setCustom(Arrays.asList(tempLegendEntry));
+        final List<Entry> tempEntries = new ArrayList<>();
+        final List<Entry> humidityEntries = new ArrayList<>();
+        final List<Entry> pressureEntries = new ArrayList<>();
+        final List<Entry> lightEntries = new ArrayList<>();
+        final ArrayList<Payload> payloads = devices.get(0).getPayloads();
 
-        tempChart.setTouchEnabled(false);
-        tempChart.setDragEnabled(false);
-        tempChart.setDoubleTapToZoomEnabled(false);
-        XAxis tempX = tempChart.getXAxis();
-        tempX.setValueFormatter(new DateAxisFormatter(tempChart));
-        tempX.setPosition(XAxis.XAxisPosition.BOTTOM);
-        tempX.setLabelCount(5);
-        tempX.setTextSize(9);
-        tempChart.getDescription().setEnabled(false);
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
 
-        List<Entry> tempEntries = new ArrayList<>();
-        List<Entry> humidityEntries = new ArrayList<>();
-        List<Entry> pressureEntries = new ArrayList<>();
-        List<Entry> lightEntries = new ArrayList<>();
-        ArrayList<Payload> payloads = devices.get(0).getPayloads();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
-
-        for (Payload payload : payloads) {
-            try {
-                Date date = sdf.parse(payload.getTime_stamp());
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(date);
-                tempEntries.add(new Entry(calendar.getTimeInMillis(), Integer.valueOf(payload.getTemperature())));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+        final String[] selectedPeriod = {homePeriodSpinner.getSelectedItem().toString()};
+        String latestEntryTime = payloads.get(payloads.size() - 1).getTime_stamp();
+        Date lastEntry = new Date();
+        final Calendar calendar = Calendar.getInstance();
+        try {
+            lastEntry = sdf.parse(latestEntryTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+        final Date[] targetDate = {new Date()};
 
-        LineDataSet lds = new LineDataSet(tempEntries, "Date");
-        lds.setDrawCircles(false);
-        LineData ld = new LineData(lds);
-        lds.setColor(ColorTemplate.rgb("66FFFF"));
-        tempChart.setData(ld);
-        tempChart.invalidate();
+        final Date finalLastEntry = lastEntry;
+        homePeriodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedPeriod[0] = homePeriodSpinner.getSelectedItem().toString();
+
+                switch (selectedPeriod[0]) {
+                    case "Hour":
+                        calendar.setTime(finalLastEntry);
+                        calendar.add(Calendar.HOUR, -1);
+                        targetDate[0] = calendar.getTime();
+                        labelCount[0] = 12;
+                        format[0] = "m:H";
+                        break;
+                    case "Day":
+                        calendar.setTime(finalLastEntry);
+                        calendar.add(Calendar.DAY_OF_MONTH, -1);
+                        targetDate[0] = calendar.getTime();
+                        labelCount[0] = 12;
+                        format[0] = "H";
+                        break;
+                    case "Week":
+                        calendar.setTime(finalLastEntry);
+                        calendar.add(Calendar.DAY_OF_MONTH, -7);
+                        targetDate[0] = calendar.getTime();
+                        labelCount[0] = 7;
+                        format[0] = "E";
+                        break;
+                    case "Since Start":
+                        String startDate = payloads.get(0).getTime_stamp();
+                        labelCount[0] = 5;
+                        format[0] = "dd/M";
+                        try {
+                            targetDate[0] = sdf.parse(startDate);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                tempEntries.clear();
+                humidityEntries.clear();
+                pressureEntries.clear();
+                lightEntries.clear();
+                for (int index = payloads.size() - 1; true && index >= 0; index--) {
+                    Payload tempPayload = payloads.get(index);
+                    try {
+                        Date tempPayloadDate = sdf.parse(tempPayload.getTime_stamp());
+                        if (tempPayloadDate.after(targetDate[0]) || tempPayloadDate.equals(targetDate[0])) {
+                            tempEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getTemperature())));
+                            humidityEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getHumidity())));
+                            pressureEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getBarometric())));
+                            lightEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getLuminostiy())));
+                        } else
+                            break;
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                tempChart.setSettings(format[0], labelCount[0]);
+                tempChart.setLds(tempEntries, "Temperature");
+                tempChart.setLegend("Temperature", ColorTemplate.rgb("B00103"));
+                tempChart.drawCircles(true);
+                tempChart.setLd();
+                tempChart.setLineDataSetColor(ColorTemplate.rgb("B00103"));
+                tempChart.refresh();
+
+                humidityChart.setSettings(format[0], labelCount[0]);
+                humidityChart.setLds(humidityEntries, "Humidity");
+                humidityChart.drawCircles(false);
+                humidityChart.setLd();
+                humidityChart.setLineDataSetColor(ColorTemplate.rgb("66FFFF"));
+                humidityChart.refresh();
+
+                pressureChart.setSettings(format[0], labelCount[0]);
+                pressureChart.setLds(pressureEntries, "Pressure");
+                pressureChart.setLegend("Pressure", ColorTemplate.rgb("9D7228"));
+                pressureChart.drawCircles(false);
+                pressureChart.setLd();
+                pressureChart.setLineDataSetColor(ColorTemplate.rgb("9D7228"));
+                pressureChart.refresh();
+
+                lightChart.setSettings(format[0], labelCount[0]);
+                lightChart.setLds(lightEntries, "Light");
+                lightChart.setLegend("Light", ColorTemplate.rgb("FFD700"));
+                lightChart.drawCircles(false);
+                lightChart.setLd();
+                lightChart.setLineDataSetColor(ColorTemplate.rgb("FFD700"));
+                lightChart.refresh();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         final Intent intent1 = new Intent(MainActivity.this, PayloadTable.class);
         intent1.putExtra("devices", Parcels.wrap(devices));

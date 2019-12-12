@@ -57,6 +57,7 @@ public class PayloadTable extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PayloadTable.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("devices", Parcels.wrap(devices));
                 startActivity(intent);
             }
@@ -91,14 +92,14 @@ public class PayloadTable extends AppCompatActivity{
             TableColumnWeightModel columnModel = new TableColumnWeightModel(6);
             columnModel.setColumnWeight(1, 2);
             String[] tableHeaders = {"device_id", "DateTime", (char) 0x00B0 + "C", "Humidity(%)", "hPa", "Lux"};
-            for (int row = 0; row < size; row++) {
+            for (int row = size - 1, dataRow = 0; row >= 0; row--, dataRow++) {
                 Payload payload = payloads.get(row);
-                data[row][0] = payload.getDevice_id();
-                data[row][1] = payload.getTime_stamp();
-                data[row][2] = payload.getTemperature();
-                data[row][3] = payload.getHumidity();
-                data[row][4] = payload.getBarometric() + "0";
-                data[row][5] = payload.getLuminostiy();
+                data[dataRow][0] = payload.getDevice_id();
+                data[dataRow][1] = payload.getTime_stamp();
+                data[dataRow][2] = payload.getTemperature();
+                data[dataRow][3] = payload.getHumidity();
+                data[dataRow][4] = payload.getBarometric() + "0";
+                data[dataRow][5] = payload.getLuminostiy();
             }
             payloadTable.setColumnModel(columnModel);
             payloadTable.setDataAdapter(new SimpleTableDataAdapter(PayloadTable.this, data));

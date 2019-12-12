@@ -60,9 +60,10 @@ public class LoadData extends AppCompatActivity {
                 }
                 Intent redirect = getIntent();
                 Intent intent;
-                if (redirect.getExtras() == null) {
+                if (redirect.getExtras() == null || (redirect.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
                     intent = new Intent(LoadData.this, MainActivity.class);
                 } else {
+
                     String destination = redirect.getExtras().getString("class");
                     switch (destination) {
                         case "MainActivity":
@@ -78,6 +79,7 @@ public class LoadData extends AppCompatActivity {
                     intent.putExtra("nodeID", redirect.getExtras().getString("nodeID"));
                 }
                 intent.putExtra("devices", Parcels.wrap(devices));
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
         }, new Response.ErrorListener() {

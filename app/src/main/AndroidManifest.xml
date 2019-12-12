@@ -13,15 +13,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".PayloadTable" android:screenOrientation="landscape"></activity>
-        <activity android:name=".LoadData">
+        <activity android:name=".PayloadTable" android:screenOrientation="landscape" android:finishOnTaskLaunch="true"
+            android:noHistory="true"></activity>
+        <activity android:name=".LoadData" android:clearTaskOnLaunch="true" android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity" android:screenOrientation="portrait" android:finishOnTaskLaunch="true" />
     </application>
 
 </manifest>

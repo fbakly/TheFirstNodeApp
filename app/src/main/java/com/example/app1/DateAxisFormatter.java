@@ -12,16 +12,18 @@ import java.util.TimeZone;
 
 public class DateAxisFormatter extends ValueFormatter {
     private Chart chart;
-    public DateAxisFormatter(Chart chart) {
+    private String format;
+    public DateAxisFormatter(Chart chart, String format) {
         super();
         this.chart = chart;
+        this.format = format;
     }
 
     @Override
     public String getAxisLabel(float value, AxisBase axis) {
         String result = "";
         Date date = new Date((long)value);
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM H:mm");
+        SimpleDateFormat format = new SimpleDateFormat(this.format);
         format.setTimeZone(TimeZone.getDefault());
         result = format.format(date);
         return result;
