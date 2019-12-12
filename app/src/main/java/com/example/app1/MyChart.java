@@ -82,9 +82,12 @@ public class MyChart {
         lds.setDrawCircles(condition);
     }
 
+    public void setAnimation(int millis) {
+        chart.animateX(millis);
+    }
+
     public void refresh() {
         chart.setData(ld);
-        chart.animateX(4000);
         chart.invalidate();
     }
 

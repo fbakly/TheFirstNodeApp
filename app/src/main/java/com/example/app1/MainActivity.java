@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-dd hh:mm:ss");
 
         final String[] selectedPeriod = {homePeriodSpinner.getSelectedItem().toString()};
-        String latestEntryTime = payloads.get(payloads.size() - 1).getTime_stamp();
+        final String latestEntryTime = payloads.get(payloads.size() - 1).getTime_stamp();
         Date lastEntry = new Date();
         final Calendar calendar = Calendar.getInstance();
         try {
@@ -118,15 +118,15 @@ public class MainActivity extends AppCompatActivity {
                         calendar.setTime(finalLastEntry);
                         calendar.add(Calendar.HOUR, -1);
                         targetDate[0] = calendar.getTime();
-                        labelCount[0] = 12;
+                        labelCount[0] = 4;
                         format[0] = "m:H";
                         break;
                     case "Day":
                         calendar.setTime(finalLastEntry);
                         calendar.add(Calendar.DAY_OF_MONTH, -1);
                         targetDate[0] = calendar.getTime();
-                        labelCount[0] = 12;
-                        format[0] = "H";
+                        labelCount[0] = 8;
+                        format[0] = "H d";
                         break;
                     case "Week":
                         calendar.setTime(finalLastEntry);
@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                         format[0] = "E";
                         break;
                     case "Since Start":
+                        calendar.setTime(finalLastEntry);
                         String startDate = payloads.get(0).getTime_stamp();
                         labelCount[0] = 5;
                         format[0] = "dd/M";
@@ -152,8 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 humidityEntries.clear();
                 pressureEntries.clear();
                 lightEntries.clear();
-                for (int index = payloads.size() - 1; true && index >= 0; index--) {
-                    Payload tempPayload = payloads.get(index);
+                for (Payload tempPayload : payloads) {
                     try {
                         Date tempPayloadDate = sdf.parse(tempPayload.getTime_stamp());
                         calendar.setTime(tempPayloadDate);
@@ -162,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
                             humidityEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getHumidity())));
                             pressureEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getBarometric())));
                             lightEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getLuminostiy())));
-                        } else
+                        }
+                        if(tempPayload.getTime_stamp().equals(latestEntryTime))
                             break;
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -172,9 +173,10 @@ public class MainActivity extends AppCompatActivity {
                 tempChart.setSettings(format[0], labelCount[0]);
                 tempChart.setLds(tempEntries, "Temperature");
                 tempChart.setLegend("Temperature", ColorTemplate.rgb("B00103"));
-                tempChart.drawCircles(true);
+                tempChart.drawCircles(false);
                 tempChart.setLd();
                 tempChart.setLineDataSetColor(ColorTemplate.rgb("B00103"));
+                tempChart.setAnimation(2000);
                 tempChart.refresh();
 
                 humidityChart.setSettings(format[0], labelCount[0]);
@@ -182,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 humidityChart.drawCircles(false);
                 humidityChart.setLd();
                 humidityChart.setLineDataSetColor(ColorTemplate.rgb("66FFFF"));
+                humidityChart.setAnimation(2000);
                 humidityChart.refresh();
 
                 pressureChart.setSettings(format[0], labelCount[0]);
@@ -190,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 pressureChart.drawCircles(false);
                 pressureChart.setLd();
                 pressureChart.setLineDataSetColor(ColorTemplate.rgb("9D7228"));
+                pressureChart.setAnimation(2000);
                 pressureChart.refresh();
 
                 lightChart.setSettings(format[0], labelCount[0]);
@@ -198,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 lightChart.drawCircles(false);
                 lightChart.setLd();
                 lightChart.setLineDataSetColor(ColorTemplate.rgb("FFD700"));
+                lightChart.setAnimation(2000);
                 lightChart.refresh();
             }
 
