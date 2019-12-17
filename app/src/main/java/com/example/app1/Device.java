@@ -1,11 +1,6 @@
 package com.example.app1;
 
-import android.os.Parcelable;
-
 import org.parceler.Parcel;
-
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Objects;
 

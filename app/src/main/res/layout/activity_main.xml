@@ -44,13 +44,52 @@
                 android:textSize="30sp" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/nodeReadingHumidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_toLeftOf="@id/nodeReadingLight"
+            android:gravity="center"
+            android:paddingTop="5dp"
+            android:paddingEnd="5dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp"
+            android:text="TextView"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/nodeReadingPressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@id/nodeReadingLight"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="TextView"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/nodeReadingLight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="false"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="TextView"
+            android:textSize="14sp" />
+
         <Spinner
             android:id="@+id/homePeriodSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/linLayout"
+            android:layout_below="@id/nodeReadingHumidity"
             android:layout_centerInParent="true"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="10dp" />
 
         <HorizontalScrollView
             android:layout_width="match_parent"

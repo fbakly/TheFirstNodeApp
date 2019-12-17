@@ -22,14 +22,6 @@
             android:layout_marginTop="20dp"
             android:text="Back" />
 
-        <Button
-            android:id="@+id/refreshButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:text="Refresh" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -55,7 +47,7 @@
         android:layout_marginTop="100dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <de.codecrafters.tableview.TableView
+        <de.codecrafters.tableview.SortableTableView
             android:id="@+id/payloadTable"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

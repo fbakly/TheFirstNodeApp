@@ -1,46 +1,39 @@
 package com.example.app1;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.parceler.Parcels;
-
 import java.util.ArrayList;
 
 public class LoadData extends AppCompatActivity {
     ArrayList<Device> devices;
-    DatabaseReference mDatabase;
     final String url = "http://lora.fambaan.com/php/getPayloads.php";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load_data);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         devices = new ArrayList<>();
 
         // Get a request Queue
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 try {
-//                    mDatabase.child("Payload").removeValue();
                     int length = response.length();
-                    for (int index = 0; index < length; index++) {
+                    int stepSize = (length >= 2000) ? length / 2000 : 1;
+                    for (int index = 0; index < length; index += stepSize) {
                         JSONObject row = (JSONObject) response.get(index);
                         Device tempDevice = new Device(row.getString("device_id"));
                         if (!devices.contains(tempDevice))
@@ -53,11 +46,18 @@ public class LoadData extends AppCompatActivity {
                                 row.getString("barometric"),
                                 row.getString("luminosity")
                         ));
-//                        mDatabase.child("Payload").child(row.getString("device_id") + " " + row.getString("time_stamp")).push().setValue(row.getString("temperature"));
+                        final String device_id = row.getString("device_id");
+                        final String time_stamp = row.getString("time_stamp");
+                        final String temperature = row.getString("temperature");
+                        final String humidity = row.getString("humidity");
+                        final String barometric = row.getString("barometric");
+                        final String luminosity = row.getString("luminosity");
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
                 Intent redirect = getIntent();
                 Intent intent;
                 if (redirect.getExtras() == null || (redirect.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
@@ -88,8 +88,6 @@ public class LoadData extends AppCompatActivity {
                 error.printStackTrace();
             }
         });
-
         MySingleton.getInstance(LoadData.this).addToRequestQueue(jsonArrayRequest);
-
     }
 }
