@@ -1,6 +1,7 @@
 package com.example.app1;
 
 import org.parceler.Parcel;
+
 import java.util.ArrayList;
 import java.util.Objects;
 

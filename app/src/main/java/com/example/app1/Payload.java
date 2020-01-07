@@ -1,20 +1,22 @@
 package com.example.app1;
 
 import org.parceler.Parcel;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 @Parcel
-public class Payload{
-     String device_id;
-     String time_stamp;
-     String temperature;
-     String humidity;
-     String barometric;
-     String luminostiy;
+public class Payload {
+    String device_id;
+    String time_stamp;
+    String temperature;
+    String humidity;
+    String barometric;
+    String luminostiy;
 
-    public Payload() {}
+    public Payload() {
+    }
 
     public Payload(String device_id, String time_stamp, String temperature, String humidity, String barometric, String luminostiy) {
         this.device_id = device_id;

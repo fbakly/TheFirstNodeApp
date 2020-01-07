@@ -21,10 +21,6 @@ public class DateAxisFormatter extends ValueFormatter {
     public String getAxisLabel(float value, AxisBase axis) {
         String result = "";
         Date date = new Date((long)value);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.HOUR_OF_DAY, 2);
-        date = calendar.getTime();
         SimpleDateFormat format = new SimpleDateFormat(this.format);
         format.setTimeZone(TimeZone.getDefault());
         result = format.format(date);
