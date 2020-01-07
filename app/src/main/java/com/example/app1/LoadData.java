@@ -48,6 +48,7 @@ public class LoadData extends AppCompatActivity {
             @Override
             public void onResponse(JSONArray response) {
                 try {
+                    findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     int length = response.length();
                     int stepSize = (length >= 2000) ? length / 2000 : 1;
                     for (int index = 0; index < length; index += stepSize) {
@@ -110,6 +111,7 @@ public class LoadData extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                 loadDataText.setText("Error loading data\nClick here to retry");
                 loadDataText.setOnClickListener(new View.OnClickListener() {
                     @Override
