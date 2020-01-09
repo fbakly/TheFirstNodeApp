@@ -49,6 +49,7 @@ public class MyChart {
         chart.setDragEnabled(false);
         chart.setDoubleTapToZoomEnabled(false);
         XAxis tempX = chart.getXAxis();
+        // Sets the axis formatter to DateAxisFormatter class
         tempX.setValueFormatter(new DateAxisFormatter(chart, format));
         tempX.setPosition(XAxis.XAxisPosition.BOTTOM);
         tempX.setLabelCount(labelCount);

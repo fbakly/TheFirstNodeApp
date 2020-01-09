@@ -17,6 +17,9 @@ public class DateAxisFormatter extends ValueFormatter {
         this.format = format;
     }
 
+
+    // This function receives the time in milliseconds and transforms it into a string to
+    // Have the date on the x-axis
     @Override
     public String getAxisLabel(float value, AxisBase axis) {
         String result = "";
