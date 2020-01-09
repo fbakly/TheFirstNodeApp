@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        // Get Views from the layout files via their IDs
         Button refresh = (Button) findViewById(R.id.refreshButtonHome);
         final TextView nodeID = (TextView) findViewById(R.id.nodeID);
         final TextView nodeReading = (TextView) findViewById(R.id.nodeReading);
@@ -57,34 +58,49 @@ public class MainActivity extends AppCompatActivity {
         final MyChart lightChart = new MyChart((LineChart) findViewById(R.id.lightChart));
         final Spinner homePeriodSpinner = (Spinner) findViewById(R.id.homePeriodSpinner);
 
+        // Make a new arraylist of string to add to the drop down menu as items
         ArrayList<String> spinnerItems = new ArrayList<>();
         spinnerItems.add("Hour");
         spinnerItems.add("Day");
         spinnerItems.add("Week");
         spinnerItems.add("Since Start");
 
-        final int[] labelCount = {0};
-        final String[] format = {""};
-
+        // Set the home spinner's (drop down menu) adapter to the arraylist
         homePeriodSpinner.setAdapter(new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_spinner_dropdown_item, spinnerItems));
 
+        // Set an empty label count and format due to it changing depending on the chosen period
+        // from the spinner
+        final int[] labelCount = {0};
+        final String[] format = {""};
+
+        // Get the intent sent from the LoadData class and get the data that is sent
         Intent intent = getIntent();
         final ArrayList<Device> devices = (ArrayList<Device>) Parcels.unwrap(intent.getExtras().getParcelable("devices"));
 
+        // Calls the setLatestReading function to display the last read values on textually
         setLatestReading(devices, nodeID, nodeReading, nodeReadingHumidity, nodeReadingLight,
                 nodeReadingPressure);
 
+        // Create empty lists of type Entry for each of readings received
         final List<Entry> tempEntries = new ArrayList<>();
         final List<Entry> humidityEntries = new ArrayList<>();
         final List<Entry> pressureEntries = new ArrayList<>();
         final List<Entry> lightEntries = new ArrayList<>();
+
+        // Get the payloads of the first device since only 1 device is currently available
         final ArrayList<Payload> payloads = devices.get(0).getPayloads();
 
+        // Create a date formatter to parse the received time_stamp string into a Date
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-dd HH:mm:ss");
 
+        // Create an array of string to get the selected period
+        // An array is required due to it being called in the spinner onItemSelectedListener
         final String[] selectedPeriod = {homePeriodSpinner.getSelectedItem().toString()};
+
+        // Get the time_stamp of the last entry
         final String latestEntryTime = payloads.get(payloads.size() - 1).getTime_stamp();
+
         Date lastEntry = new Date();
         final Calendar calendar = Calendar.getInstance();
         try {
