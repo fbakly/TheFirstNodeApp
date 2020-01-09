@@ -104,18 +104,28 @@ public class MainActivity extends AppCompatActivity {
         Date lastEntry = new Date();
         final Calendar calendar = Calendar.getInstance();
         try {
+            // Parse the last entry time to the lastEntry Date type
             lastEntry = sdf.parse(latestEntryTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+
         final Date[] targetDate = {new Date()};
 
+        // Create a final variable due to it being used in a subclass
         final Date finalLastEntry = lastEntry;
+
+        // Set a listener on the home spinner to determine the time period selected
         homePeriodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                // Get the selected time period
                 selectedPeriod[0] = homePeriodSpinner.getSelectedItem().toString();
 
+                // Depending on the selected period the target date is calculated, number of labels
+                // is set and the display format is set
                 switch (selectedPeriod[0]) {
                     case "Hour":
                         calendar.setTime(finalLastEntry);
@@ -152,10 +162,16 @@ public class MainActivity extends AppCompatActivity {
                     default:
                         break;
                 }
+
+                // Clear the entries so it doesn't overlap with entries of previous period selection
                 tempEntries.clear();
                 humidityEntries.clear();
                 pressureEntries.clear();
                 lightEntries.clear();
+
+                // Loop through the payloads to add the entries starting from the target date
+                // get date in milliseconds which calls the DateAxisFormatter class due to the inability
+                // to plot with string
                 for (Payload tempPayload : payloads) {
                     try {
                         Date tempPayloadDate = sdf.parse(tempPayload.getTime_stamp());
@@ -166,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                             pressureEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getBarometric())));
                             lightEntries.add(new Entry(calendar.getTimeInMillis(), Float.valueOf(tempPayload.getLuminostiy())));
                         }
+                        // stop looping if the current looped time stamp is equal to the latest entry time
                         if (tempPayload.getTime_stamp().equals(latestEntryTime))
                             break;
                     } catch (ParseException e) {
@@ -173,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+                // Calls the set chart method
                 setChart(tempChart, format[0], labelCount[0], tempEntries, "Temperature", ColorTemplate.rgb("B00103"));
                 setChart(humidityChart, format[0], labelCount[0], humidityEntries, "Humidity", ColorTemplate.rgb("66FFFF"));
                 setChart(pressureChart, format[0], labelCount[0], pressureEntries, "Pressure", ColorTemplate.rgb("9D7228"));
@@ -185,6 +203,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Set an on click listener on the node reading to start an intent to take the user to the
+        // PayloadTable activity
         nodeReading.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -195,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Set an on click listener  on the refresh button to take the user to the LoadData activity
+        // and refresh the data
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Sets the chart settings and refreshes the data
     private void setChart(MyChart chart, String format, int labelCount, List<Entry> entries,
                           String labelText, int color) {
         chart.setSettings(format, labelCount);
@@ -217,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
         chart.refresh();
     }
 
+    // Displays the latest readings on the main activity
     private void setLatestReading(ArrayList<Device> devices, TextView nodeID, TextView nodeReading,
                                   TextView nodeReadingHumidity, TextView nodeReadingLight,
                                   TextView nodeReadingPressure) {

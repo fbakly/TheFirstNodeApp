@@ -29,6 +29,7 @@ import java.util.Date;
 
 public class LoadData extends AppCompatActivity {
     ArrayList<Device> devices;
+    // URL of the php script which gets data from the sql database on the server
     final String url = "http://lora.fambaan.com/php/getPayloads.php";
 
     @Override
@@ -36,26 +37,37 @@ public class LoadData extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load_data);
 
+        // Get load data text vie and Set the load data text to center screen
         final TextView loadDataText = (TextView) findViewById(R.id.loadDataText);
         loadDataText.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
 
         devices = new ArrayList<>();
         final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
-        // Get a request Queue
+        // Get a request Queue instance
         RequestQueue queue = MySingleton.getInstance(this.getApplicationContext()).getRequestQueue();
 
+        // Create a json array request which contains a listener where on response gets a json object array
         final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+            // On connection successful
             @Override
             public void onResponse(JSONArray response) {
                 try {
+                    // remove loading panel
                     findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                    // Get number of JSON objects
                     int length = response.length();
+                    // Calculate step size so that only 2000 data points are parsed
                     int stepSize = (length >= 2000) ? length / 2000 : 1;
+                    // Loop through JSON objects with step size
                     for (int index = 0; index < length; index += stepSize) {
+                        // Get JSON object as index
                         JSONObject row = (JSONObject) response.get(index);
+                        // Create a temp device with the device id of the json object
                         Device tempDevice = new Device(row.getString("device_id"));
+                        // if the devices arraylist doesn't contain the tempdevice add it to the arraylist
                         if (!devices.contains(tempDevice))
                             devices.add(tempDevice);
+                        // Format timestamp to Netherlands time
                         String timeStamp = row.getString("time_stamp");
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-M-dd HH:mm:ss");
                         Date timeStampDate = sdf.parse(timeStamp);
@@ -63,6 +75,7 @@ public class LoadData extends AppCompatActivity {
                         calendar.setTime(timeStampDate);
                         calendar.add(Calendar.HOUR_OF_DAY, 2);
                         timeStamp = sdf.format(calendar.getTime()).toString();
+                        // Get device from arraylist and add payload to it
                         devices.get(devices.indexOf(tempDevice)).addToPayloads(new Payload(
                                 row.getString("device_id"),
                                 timeStamp,
@@ -71,48 +84,33 @@ public class LoadData extends AppCompatActivity {
                                 row.getString("barometric"),
                                 row.getString("luminosity")
                         ));
-                        final String device_id = row.getString("device_id");
-                        final String time_stamp = row.getString("time_stamp");
-                        final String temperature = row.getString("temperature");
-                        final String humidity = row.getString("humidity");
-                        final String barometric = row.getString("barometric");
-                        final String luminosity = row.getString("luminosity");
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
+                // Get intent if any existing
                 Intent redirect = getIntent();
-                Intent intent;
-                if (redirect.getExtras() == null || (redirect.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
-                    intent = new Intent(LoadData.this, MainActivity.class);
-                } else {
+                // Create a new intent to switch to main activity
+                Intent intent = new Intent(LoadData.this, MainActivity.class);
 
-                    String destination = redirect.getExtras().getString("class");
-                    switch (destination) {
-                        case "MainActivity":
-                            intent = new Intent(LoadData.this, MainActivity.class);
-                            break;
-                        case "PayloadTable":
-                            intent = new Intent(LoadData.this, PayloadTable.class);
-                            break;
-                        default:
-                            intent = new Intent(LoadData.this, MainActivity.class);
-                            break;
-                    }
-                    intent.putExtra("nodeID", redirect.getExtras().getString("nodeID"));
-                }
+                // Add devices arraylist to intent as a parcelable using the parcels library
+                // To send to main acitivity
                 intent.putExtra("devices", Parcels.wrap(devices));
+                // Add flags to remove from activity stack
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
         }, new Response.ErrorListener() {
+            // On error
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                // make loading panel disappear
                 findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                // Set error text
                 loadDataText.setText("Error loading data\nClick here to retry");
+                // Set on on click listener to resetart activity to retry
                 loadDataText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -123,6 +121,8 @@ public class LoadData extends AppCompatActivity {
                 });
             }
         });
+
+        // Adds the jsonArrayRequest to the request quque of the MySingelton queue
         MySingleton.getInstance(LoadData.this).addToRequestQueue(jsonArrayRequest);
     }
 }
