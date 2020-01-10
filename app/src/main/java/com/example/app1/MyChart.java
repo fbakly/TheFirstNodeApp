@@ -1,3 +1,10 @@
+/**
+ * @Class: MyChart
+ * @Description: Class that uses the MPAndroidChart library LineChart. Sets custom settings, and
+ *                  refreshes graph
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import com.github.mikephil.charting.charts.LineChart;

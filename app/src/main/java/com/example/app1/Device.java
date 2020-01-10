@@ -1,7 +1,12 @@
+/**
+ * @Class: Device
+ * @Description: Device class which contains unique devices and their payloads
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import org.parceler.Parcel;
-
 import java.util.ArrayList;
 import java.util.Objects;
 

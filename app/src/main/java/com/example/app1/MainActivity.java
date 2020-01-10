@@ -1,8 +1,8 @@
 /**
  * @Class: Mainactivity
- * @Description: ...
- * @Methods: ...
- * @Author: Fouad
+ * @Description: Creates the MainActivity which shows the graphs and latest readings
+ *                  also sends the payload to the PayloadTable class
+ * @Author: Fouad Elbakly
  */
 
 package com.example.app1;

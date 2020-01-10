@@ -1,3 +1,9 @@
+/**
+ * @Class: LoadData
+ * @Description: Gets JSON objects from PHP script on the web server
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,9 +12,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 

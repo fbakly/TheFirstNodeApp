@@ -1,3 +1,9 @@
+/**
+ * @Class: Payload
+ * @Description: Payload class which contains the payloads parsed from the PHP script
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import org.parceler.Parcel;

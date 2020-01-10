@@ -1,3 +1,9 @@
+/**
+ * @Class: PayloadTable
+ * @Description: Class that creates a sortable table using the TableView library
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +17,6 @@ import org.parceler.Parcels;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import de.codecrafters.tableview.SortableTableView;

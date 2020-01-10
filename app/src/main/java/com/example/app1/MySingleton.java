@@ -1,3 +1,9 @@
+/**
+ * @Class: MySingleton
+ * @Description: A Singleton class so that no more than 1 request queue is created. Uses volley library
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import android.content.Context;

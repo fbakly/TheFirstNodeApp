@@ -1,3 +1,9 @@
+/**
+ * @Class: DateAxisFormatter
+ * @Description: Gets time in millis and formats it to given date format
+ * @Author: Fouad Elbakly
+ */
+
 package com.example.app1;
 
 import com.github.mikephil.charting.charts.Chart;
