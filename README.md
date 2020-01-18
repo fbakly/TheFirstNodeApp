@@ -10,6 +10,9 @@ The application was built with Java using android studio
 
 # Libraries used
 [Parceler](https://github.com/johncarl81/parceler)
+
 [MPAndoirdChart](https://github.com/PhilJay/MPAndroidChart#gradle-setup)
+
 [SortableTableView](https://github.com/ISchwarz23/SortableTableView)
+
 [Volley](https://github.com/ISchwarz23/SortableTableView)
