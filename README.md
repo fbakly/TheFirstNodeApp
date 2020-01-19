@@ -1,4 +1,4 @@
-# The First Node Weather Appliaction
+# The First Node Weather Application
 
 # Introduction
 The First Node Weather Application runs on Android devices with SDK 24 and higher.
